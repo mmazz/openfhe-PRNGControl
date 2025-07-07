@@ -11,7 +11,7 @@ namespace cfg {
     struct Config {
         bool injectError = false;
         int injectMode = 0;           // 0 = no injection, 1 = real, 2 = imag, 3 = both
-        bool secretKeyAttack = false;
+        bool secretKeyAttackDisable = false;
         int sdcThresholdBits = 5;     // Default: 5 bits from precision limit
 
         static Config Load() {
@@ -26,7 +26,7 @@ namespace cfg {
                 in >> j;
                 cfg.injectError      = j.value("injectError", 0) > 0;
                 cfg.injectMode       = j.value("injectMode", 0);
-                cfg.secretKeyAttack  = j.value("secretKeyAttack", 0) > 0;
+                cfg.secretKeyAttackDisable  = j.value("secretKeyAttackDisable", 0) > 0;
                 cfg.sdcThresholdBits = j.value("sdcThresholdBits", 5);
             } catch (const std::exception& e) {
                 std::cerr << "Error parsing config file: " << e.what() << "\n";
@@ -36,7 +36,7 @@ namespace cfg {
 
         static std::filesystem::path defaultConfigPath() {
             if (const char* custom = std::getenv("CKKS_CONFIG_PATH")) {
-                return std::filesystem::path(custom);
+                return std::filesystem::path(custom)/ "config.json";;
             }
             if (const char* h = std::getenv("HOME")) {
                 return std::filesystem::path(h) / "ckksBitFlip" / "openfheBitFlip" / "config.json";

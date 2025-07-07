@@ -467,8 +467,13 @@ bool CKKSPackedEncoding::Decode(size_t noiseScaleDeg, double scalingFactor, Scal
         if (ckksDataType == REAL) {
             //   If less than 5 bits of precision is observed
             bool detected = (logstd > p - cfg.sdcThresholdBits);
-            if (cfg.secretKeyAttack && detected) {
-                cfg::logSDC(true);
+            if (cfg.secretKeyAttackDisable){
+                cfg::logSDC(detected);
+            }
+            else{
+                OPENFHE_THROW(
+                    "The decryption failed because the approximation error is "
+                    "too high. Check the parameters. ");
             }
 
         }

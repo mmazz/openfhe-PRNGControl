@@ -35,6 +35,7 @@ cmake -DCMAKE_INSTALL_PREFIX=$HOME/openfhe-prng/install -DBUILD_STATIC=ON -DBUIL
 After this, compile:
 '''
 make -j16
+sudo make install
 '''
 
 ### Posible bugs:
@@ -104,10 +105,13 @@ if (logstd > p - cfg.sdcThresholdBits) {
 
 ```json
 {
-  "injectError": 1,
-  "injectMode": 3,
-  "secretKeyAttack": 1,
-  "sdcThresholdBits": 5
+  "injectError": 1,         // Disable the inyection error with 0
+  "injectMode": 3,          // 1: inyec only real part
+                            // 2: inyect only imaginary part
+                            // 3 or greater: inytect both
+  "secretKeyAttack": 1,     // 0: enable execption
+                            // 1 or greater: log the expection
+  "sdcThresholdBits": 5     // amount of bits for threshold
 }
 ```
 

@@ -25,7 +25,7 @@ cmake -DCMAKE_INSTALL_PREFIX=$HOME/openfhe-prng/install -DBUILD_STATIC=OFF -DBUI
       -DBUILD_BENCHMARKS=OFF -DBUILD_EXTRAS=OFF ..
 '''
 
-To use with PIN:
+To use with PIN (static):
 '''
 cmake -DCMAKE_INSTALL_PREFIX=$HOME/openfhe-prng/install -DBUILD_STATIC=ON -DBUILD_SHARED=OFF \
       -DCMAKE_BUILD_TYPE=Debug -DWITH_OPENMP=OFF -DBUILD_UNITTESTS=OFF \
@@ -73,6 +73,23 @@ We’ve extended the existing OpenFHE PRNG wrapper with three key additions to e
 
 ## Usage:
 
+### Compilation of code
+
+
+Use the same flags that the compilation of OpenFHE.
+
+For thise we only care of the flags:
+
+-  CMAKE_PREFIX_PATH = CMAKE_INSTALL_PREFIX
+-  BUILD_STATIC
+-  CMAKE_BUILD_TYPE
+-  CMAKE_CXX_FLAGS
+
+Ej:
+'''
+cmake -DCMAKE_PREFIX_PATH=$HOME/openfhe-prng/install -DBUILD_STATIC=OFF -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-g -O3" .
+'''
+
 Before using it, export OPENFHE_SEED enviroment variable, or:
 
 '''
@@ -96,3 +113,5 @@ And then reset the engine using:
 '''
 PseudoRandomNumberGenerator::SetPRNGSeed(envSeed);
 '''
+
+

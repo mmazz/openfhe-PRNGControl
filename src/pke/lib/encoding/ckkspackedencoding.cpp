@@ -47,6 +47,12 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <nlohmann/json.hpp>
+#include <fstream>
+#include "config.hpp"
+
+
+
 
 namespace lbcrypto {
 
@@ -344,6 +350,8 @@ bool CKKSPackedEncoding::Encode() {
 
 bool CKKSPackedEncoding::Decode(size_t noiseScaleDeg, double scalingFactor, ScalingTechnique scalTech,
                                 ExecutionMode executionMode) {
+    auto cfg = cfg::Config::Load();
+
     double p     = encodingParams->GetPlaintextModulus();
     double powP  = 0.0;
     uint32_t Nh  = GetElementRingDimension() / 2;
@@ -458,10 +466,11 @@ bool CKKSPackedEncoding::Decode(size_t noiseScaleDeg, double scalingFactor, Scal
 
         if (ckksDataType == REAL) {
             //   If less than 5 bits of precision is observed
-            if (logstd > p - 5.0)
-                OPENFHE_THROW(
-                    "The decryption failed because the approximation error is "
-                    "too high. Check the parameters. ");
+            bool detected = (logstd > p - cfg.sdcThresholdBits);
+            if (cfg.secretKeyAttack && detected) {
+                cfg::logSDC(true);
+            }
+
         }
 
         // real values
@@ -486,10 +495,16 @@ bool CKKSPackedEncoding::Decode(size_t noiseScaleDeg, double scalingFactor, Scal
             double real = scale * curValues[i].real();
             double imag = scale * curValues[i].imag();
             if (ckksDataType == REAL) {
-                real += scale * conjugate[i].real() + powP * d(g);
-                // real += powP * dgg.GenerateIntegerKarney(0.0, stddev);
-                imag += scale * conjugate[i].imag() + powP * d(g);
-                // imag += powP * dgg.GenerateIntegerKarney(0.0, stddev);
+                if(cfg.injectError>0){
+                    if(cfg.injectMode==1)
+                        real += scale * conjugate[i].real() + powP * d(g);
+                    if(cfg.injectMode==2)
+                        imag += scale * conjugate[i].imag() + powP * d(g);
+                    else{
+                        real += scale * conjugate[i].real() + powP * d(g);
+                        imag += scale * conjugate[i].imag() + powP * d(g);
+                    }
+                }
             }
             realValues[i].real(real);
             realValues[i].imag(imag);

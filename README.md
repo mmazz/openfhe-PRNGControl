@@ -71,6 +71,48 @@ We’ve extended the existing OpenFHE PRNG wrapper with three key additions to e
    - Otherwise falls back to the original `genPRNGEngine()` behavior (fixed seed or system randomness).
    - Subsequent calls return the same engine instance, letting its internal buffer and counter advance normally until you call `SetPRNGSeed(...)` again.
 
+
+## 🔧 Configuration System
+
+We added a lightweight configuration system to control fault injection and logging behavior via a single `config.json` file.
+
+### ✅ Features
+
+- Loads experiment parameters (e.g., injection mode, SDC threshold) from `config.json`.
+- Automatically locates the file:
+  - If `CKKS_CONFIG_PATH` is set, it uses that path.
+  - Otherwise, defaults to `$HOME/ckksBitFlip/openfheBitFlip/config.json`.
+- Centralized logging of SDC events into `SKA_crash.txt`.
+
+### 🧪 Usage
+
+```cpp
+#include "config.hpp"
+
+auto cfg = cfg::Config::Load();
+
+if (cfg.injectError) {
+    // Perform fault injection depending on cfg.injectMode
+}
+
+if (logstd > p - cfg.sdcThresholdBits) {
+    cfg::logSDC(true);  // Log a Silent Data Corruption event
+}
+```
+
+### 📄 Example `config.json`
+
+```json
+{
+  "injectError": 1,
+  "injectMode": 3,
+  "secretKeyAttack": 1,
+  "sdcThresholdBits": 5
+}
+```
+
+This setup simplifies reproducibility and avoids scattered `.txt` flag files.
+
 ## Usage:
 
 ### Compilation of code

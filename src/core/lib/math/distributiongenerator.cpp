@@ -37,8 +37,10 @@
 #include "math/distributiongenerator.h"
 #include "utils/prng/blake2engine.h"
 #include "utils/exception.h"
-
+#include <cstdlib>      // getenv
 #include <iostream>
+#include <stdexcept>
+
 #if (defined(__linux__) || defined(__unix__)) && !defined(__APPLE__) && defined(__GNUC__) && !defined(__clang__)
     #include <dlfcn.h>
 #endif
@@ -51,6 +53,17 @@ namespace lbcrypto {
     thread_local std::shared_ptr<PRNG> m_prng = nullptr;
 #endif
 PseudoRandomNumberGenerator::GenPRNGEngineFuncPtr PseudoRandomNumberGenerator::genPRNGEngine = nullptr;
+
+#if defined(WITH_OPENMP)
+std::shared_ptr<PRNG> PseudoRandomNumberGenerator::m_prng = nullptr;
+#if !defined(FIXED_SEED)
+#pragma omp threadprivate(PseudoRandomNumberGenerator::m_prng)
+#endif
+#else
+std::shared_ptr<PRNG> PseudoRandomNumberGenerator::m_prng = nullptr;
+#endif
+
+std::optional<uint64_t> PseudoRandomNumberGenerator::s_externalSeed = std::nullopt;
 
 void PseudoRandomNumberGenerator::InitPRNGEngine(const std::string& libPath) {
     if (genPRNGEngine)  // if genPRNGEngine has already been initialized
@@ -88,25 +101,50 @@ void PseudoRandomNumberGenerator::InitPRNGEngine(const std::string& libPath) {
         OPENFHE_THROW("OpenFHE may use an external PRNG library linked with g++ on Linux only");
 #endif
     }
+#ifndef FIXED_SEED
+    if (!s_externalSeed) {
+        if (const char* env = std::getenv("OPENFHE_SEED")) {
+            try {
+                s_externalSeed = std::stoull(env);
+            } catch (...) {}
+        }
+    }
+#endif
 }
-
 PRNG& PseudoRandomNumberGenerator::GetPRNG() {
-    // initialization of PRNGs
-    if (m_prng == nullptr) {
+    if (!m_prng) {
 #pragma omp critical
         {
-            // we would like to believe that the block of code below is a good defense line
+            // Asegurar inicialización del constructor
             if (!genPRNGEngine)
                 InitPRNGEngine();
             if (!genPRNGEngine)
-                OPENFHE_THROW("Failure to initialize the PRNG engine");
+                throw std::runtime_error("Failure to initialize the PRNG engine");
 
-            m_prng = std::shared_ptr<PRNG>(genPRNGEngine());
+#ifndef FIXED_SEED
+            // Si hay semilla externa, crear Blake2Engine determinista
+            if (s_externalSeed) {
+                default_prng::Blake2Engine::blake2_seed_array_t arr{};
+                arr[0] = *s_externalSeed;
+                m_prng = std::make_shared<default_prng::Blake2Engine>(arr, 0);
+            } else
+#endif
+            {
+                // Motor por defecto (Blake2 con semilla fija o variable)
+                m_prng = std::shared_ptr<PRNG>(genPRNGEngine());
+            }
+
             if (!m_prng)
-                OPENFHE_THROW("Cannot create a PRNG engine");
-        }  // pragma omp critical
+                throw std::runtime_error("Cannot create a PRNG engine");
+        }
     }
     return *m_prng;
 }
+void PseudoRandomNumberGenerator::SetPRNGSeed(uint64_t seed) {
+    s_externalSeed = seed;
+    // Forzar reconstrucción en próxima GetPRNG()
+    m_prng.reset();
+}
+
 
 }  // namespace lbcrypto

@@ -39,7 +39,7 @@
 
 #include "utils/prng/prng.h"
 #include "config_core.h"
-
+#include <optional>
 #include <memory>
 #include <string>
 
@@ -67,19 +67,24 @@ public:
      */
     static PRNG& GetPRNG();
 
+    // Force to restart the engine with our external seed.
+    static void SetPRNGSeed(uint64_t seed);
+
 private:
     using GenPRNGEngineFuncPtr = PRNG* (*)();
 
 #if defined(WITH_OPENMP)
-    // shared pointer to a thread-specific PRNG engine
     static std::shared_ptr<PRNG> m_prng;
     #if !defined(FIXED_SEED)
-        // avoid contention on m_prng: local copies of m_prng are created for each thread
         #pragma omp threadprivate(m_prng)
     #endif
+#else
+    static std::shared_ptr<PRNG> m_prng;
 #endif
-    // pointer to the function generating PRNG
     static GenPRNGEngineFuncPtr genPRNGEngine;
+
+    // Nuevo: semilla interna opcional
+    static std::optional<uint64_t> s_externalSeed;
 };
 
 }  // namespace lbcrypto

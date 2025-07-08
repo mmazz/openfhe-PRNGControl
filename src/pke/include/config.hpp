@@ -69,9 +69,6 @@ namespace cfg {
             if (const char* custom = std::getenv("CKKS_CONFIG_PATH")) {
                 return std::filesystem::path(custom)/ "config.json";;
             }
-            if (const char* h = std::getenv("HOME")) {
-                return std::filesystem::path(h) / "ckksBitFlip" / "openfheBitFlip" / "config.json";
-            }
             return std::filesystem::current_path() / "config.json";
         }
     };

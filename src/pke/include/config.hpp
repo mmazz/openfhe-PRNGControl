@@ -67,9 +67,9 @@ namespace cfg {
         
         static std::filesystem::path defaultConfigPath() {
             if (const char* custom = std::getenv("CKKS_CONFIG_PATH")) {
-                return std::filesystem::path(custom)/ "config.json";;
+                return std::filesystem::path(custom)/ "config.conf";;
             }
-            return std::filesystem::current_path() / "config.json";
+            return std::filesystem::current_path() / "config.conf";
         }
     };
 

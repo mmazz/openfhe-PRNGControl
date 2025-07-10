@@ -93,14 +93,14 @@ src/core/lib/utils/prng/blake2engine.cpp
 
 ## ⚙️ Fault Injection Configuration
 
-We added a **minimal JSON-based config system** for fault injection and logging.
+We added a **minimal config system** for fault injection and logging.
 
 ### ✅ Features:
 
-- Configurable via `config.json`
+- Configurable via `config.conf`
 - Location:
   - If `CKKS_CONFIG_PATH` is set → uses that path
-  - Otherwise → defaults to: `$HOME/ckksBitFlip/openfheBitFlip/config.json`
+  - Otherwise → defaults to: `$HOME/ckksBitFlip/openfheBitFlip/config.conf`
 - Logs SDC events to `SKA_crash.txt`
 
 ### 🧪 Usage Example

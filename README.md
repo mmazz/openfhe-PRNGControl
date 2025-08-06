@@ -113,13 +113,13 @@ We added a **minimal config system** for fault injection and logging.
   "sdcThresholdBits": 5 
 }
 ```
-- injectError: If 0, no injection error
-- injectMode: If injectError>0,
-      - injectMode=1 is only to real
-      - injectMode=2 is only to img
-      - injectMode=3 is both (defualt of openfhe)
-- secretKeyAttackDisable: If 1 we disable the secret key attack mechanism
-- sdcThresholdBits: Amount of threshold, 5 is openfhe default
+* injectError: If 0, no injection error
+* injectMode: If injectError>0,
+      * injectMode=1 is only to real
+      * injectMode=2 is only to img
+      * injectMode=3 is both (defualt of openfhe)
+* secretKeyAttackDisable: If 1 we disable the secret key attack mechanism
+* sdcThresholdBits: Amount of threshold, 5 is openfhe default
 ---
 ### 🧪 Usage Example
 

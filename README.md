@@ -102,7 +102,27 @@ We added a **minimal config system** for fault injection and logging.
   - If `CKKS_CONFIG_PATH` is set → uses that path
   - Otherwise → defaults to: `$HOME/ckksBitFlip/openfheBitFlip/config.conf`
 - Logs SDC events to `SKA_crash.txt`
+- 
+### 📄 Sample `config.conf`
 
+```json
+{
+  "injectError": 1, // If 0, no injection error
+  "injectMode": 3, // If injectError>0, injectMode=1 is only to real,
+    injectMode=2 is only to img, injectMode=3 is both (defualt of openfhe)
+  "secretKeyAttackDisable ": 1, // If 1 we disable the secret key attack
+    mechanism
+  "sdcThresholdBits": 5 // Amount of threshold, 5 is openfhe default
+}
+```
+- injectError: If 0, no injection error
+- injectMode: If injectError>0,
+      - injectMode=1 is only to real
+      - injectMode=2 is only to img
+      - injectMode=3 is both (defualt of openfhe)
+- secretKeyAttackDisable: If 1 we disable the secret key attack mechanism
+- sdcThresholdBits: Amount of threshold, 5 is openfhe default
+---
 ### 🧪 Usage Example
 
 ```cpp
@@ -119,20 +139,7 @@ if (logstd > p - cfg.sdcThresholdBits) {
 }
 ```
 
-### 📄 Sample `config.conf`
 
-```json
-{
-  "injectError": 1, // If 0, no injection error
-  "injectMode": 3, // If injectError>0, injectMode=1 is only to real,
-    injectMode=2 is only to img, injectMode=3 is both (defualt of openfhe)
-  "secretKeyAttackDisable ": 1, // If 1 we disable the secret key attack
-    mechanism
-  "sdcThresholdBits": 5 // Amount of threshold, 5 is openfhe default
-}
-```
-
----
 
 ## 🛠️ Compiling Your Code
 

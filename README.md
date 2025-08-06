@@ -107,12 +107,10 @@ We added a **minimal config system** for fault injection and logging.
 
 ```json
 {
-  "injectError": 1, // If 0, no injection error
-  "injectMode": 3, // If injectError>0, injectMode=1 is only to real,
-    injectMode=2 is only to img, injectMode=3 is both (defualt of openfhe)
-  "secretKeyAttackDisable ": 1, // If 1 we disable the secret key attack
-    mechanism
-  "sdcThresholdBits": 5 // Amount of threshold, 5 is openfhe default
+  "injectError": 1, 
+  "injectMode": 3,
+  "secretKeyAttackDisable ": 1, 
+  "sdcThresholdBits": 5 
 }
 ```
 - injectError: If 0, no injection error

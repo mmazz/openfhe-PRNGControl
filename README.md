@@ -161,6 +161,10 @@ sudo make install
 ```
 
 The last make install is importart so it effectively install at the prefix path.
+It also need to add the path to de enviroment variable:
+```
+export LD_LIBRARY_PATH=$HOME/openfhe-prng/install/lib:$LD_LIBRARY_PATH
+```
 ---
 
 ## 🔁 Runtime PRNG Control

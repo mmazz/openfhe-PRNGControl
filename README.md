@@ -156,8 +156,11 @@ cmake -DCMAKE_PREFIX_PATH=$HOME/openfhe-prng/install/lib/OpenFHE \
       -DBUILD_STATIC=OFF \
       -DCMAKE_BUILD_TYPE=Debug \
       -DCMAKE_CXX_FLAGS="-g -O3" ..
+make -j16
+sudo make install
 ```
 
+The last make install is importart so it effectively install at the prefix path.
 ---
 
 ## 🔁 Runtime PRNG Control
